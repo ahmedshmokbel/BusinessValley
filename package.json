@@ -7,10 +7,12 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest --watchAll",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@mapbox/polyline": "^1.1.1",
+    "@react-native-community/geolocation": "^2.0.2",
     "axios": "^0.20.0",
     "firebase-tools": "^8.10.0",
     "patch-package": "^6.2.2",

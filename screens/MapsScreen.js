@@ -8,6 +8,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Button from '../components/Button'
 
 import Animated from "react-native-reanimated";
+import Geolocation from '@react-native-community/geolocation';
+
 
 const {
     set,
@@ -62,7 +64,9 @@ class MapsScreen extends React.PureComponent {
             isMapReady: false,
             isPaid: false,
             unsub: null,
-            isStart: false
+            isStart: false,
+            initialPosition: 'unknown',
+            lastPosition: 'unknown',
 
         }
         this.RotateValueHolder = new Animated.Value(0);
@@ -93,17 +97,15 @@ class MapsScreen extends React.PureComponent {
     componentWillUnmount() {
 
         this._isMounted = false;
-        this.state.unsub()
+        // this.state.unsub()
         clearInterval(this.interval);
+        this.watchID != null && Geolocation.clearWatch(this.watchID);
 
     }
 
     async componentDidMount() {
-        this._isMounted = true;
 
-        RNLocation.configure({
-            distanceFilter: 5.0
-        })
+        this._isMounted = true;
 
         RNLocation.requestPermission({
             ios: "whenInUse",
@@ -112,25 +114,46 @@ class MapsScreen extends React.PureComponent {
             }
         }).then(granted => {
             if (granted) {
-                console.log(
-                    'dkdkdk'
+                Geolocation.getCurrentPosition(
+                    position => {
+                        const initialPosition = JSON.stringify(position);
+                        this.setState({ initialPosition });
+                        if (this._isMounted) {
+                            this.setState({
+                                heading: position.coords.heading,
+                                currentLatitude: position.coords.latitude, currentLongitude: position.coords.longitude
+                            })
+                        }
+                        this._DrawDirection(this.state.randomLatitude, this.state.randomLongitude)
+
+                        //           console.log('initialPosition', position.coords);
+                    },
+                    error => console.log('Error', JSON.stringify(error)),
+                    { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
                 );
-                this.unsub = RNLocation.subscribeToLocationUpdates(locations => {
 
+
+
+
+                this.watchID = Geolocation.watchPosition(position => {
+                    const lastPosition = JSON.stringify(position);
+                    this.setState({ lastPosition });
                     if (this._isMounted) {
-
                         this.setState({
-                            unsub: this.unsub, heading: locations[0].heading,
-                            currentLatitude: locations[0].latitude, currentLongitude: locations[0].longitude
+                            heading: position.coords.heading,
+                            currentLatitude: position.coords.latitude, currentLongitude: position.coords.longitude
                         })
                     }
-
                     this._DrawDirection(this.state.randomLatitude, this.state.randomLongitude)
-
-
-                })
+                    //    console.log('lastPosition', position.coords);
+                });
             }
         })
+
+
+
+
+
     }
 
 
@@ -152,7 +175,7 @@ class MapsScreen extends React.PureComponent {
 
                     var dist = this.getDistance(coor[i].latitude, coor[i].longitude, coor[i + 1].latitude, coor[i + 1].longitude,)
 
-                    console.log('distanve', dist);
+                    //  console.log('distanve', dist);
                     if (this._isMounted) {
                         this.setState({
                             heading: dist + 180
@@ -220,31 +243,35 @@ class MapsScreen extends React.PureComponent {
 
         var myLocation = this.state.currentLatitude + "," + this.state.currentLongitude
 
-        const apiUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${myLocation}&destination=${destiLat},${destiLong}&key=${MapKey}&&mode=driving&optimize:true&alternatives=true`
+
         // const apiUrl = `https://maps.googleapis.com/maps/api/js?key=${myLocation}&libraries=geometry,places`
         // Linking.openURL(`http://maps.google.com/maps?daddr=${destiLat},${destiLong}`);
         try {
+            if (this.state.currentLatitude != 0) {
 
-            var res = await fetch(apiUrl)
-            var respJson = await res.json()
-            console.log('Routes', respJson.routes[0].overview_polyline.points);
-            let points = Polyline.decode(respJson.routes[0].overview_polyline.points);
-            let coords = points.map((point, index) => {
-                return {
-                    latitude: point[0],
-                    longitude: point[1]
+                const apiUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${myLocation}&destination=${destiLat},${destiLong}&key=${MapKey}&&mode=driving&optimize:true&alternatives=true`
+
+                var res = await fetch(apiUrl)
+                var respJson = await res.json()
+                // console.log('Routes', respJson.routes[0].overview_polyline.points);
+                let points = Polyline.decode(respJson.routes[0].overview_polyline.points);
+                let coords = points.map((point, index) => {
+                    return {
+                        latitude: point[0],
+                        longitude: point[1]
+                    }
+                })
+                if (this._isMounted) {
+                    this.setState({ coords: coords })
                 }
-            })
-            if (this._isMounted) {
-                this.setState({ coords: coords })
             }
-            //console.log('points', respJson.routes[0].overview_polyline.points);
-
         }
+
         catch (error) {
             console.log('Direction Catch', error)
             // this.setState({ x: "error" })
             return error
+
         }
     }
 
@@ -265,7 +292,7 @@ class MapsScreen extends React.PureComponent {
     render() {
         const { currentLatitude, currentLongitude, randomLatitude, randomLongitude, heading, markLatitude, markLongitude } = this.state
 
-        console.log('rrr',);
+        // console.log('rrr', this.state.coords);
 
 
 
@@ -299,7 +326,6 @@ class MapsScreen extends React.PureComponent {
                 >
                     <Icon name='my-location' style={[styles.card, { backgroundColor: 'lightgrey', }]} size={30} color='grey' />
                 </TouchableOpacity>
-
 
 
 
@@ -376,7 +402,7 @@ class MapsScreen extends React.PureComponent {
 
                     onUserLocationChange={event => {
 
-                        console.log('OnChange', event.nativeEvent.coordinate);
+                        //   console.log('OnChange', event.nativeEvent.coordinate);
                         if (this.state.isMapReady && this._isMounted) {
                             this.setState({
                                 //  region: region,
@@ -384,6 +410,9 @@ class MapsScreen extends React.PureComponent {
                                 currentLatitude: event.nativeEvent.coordinate.latitude, currentLongitude: event.nativeEvent.coordinate.longitude,
                                 // MarkerLocation: region
                             })
+
+                            this._DrawDirection(this.state.randomLatitude, this.state.randomLongitude)
+
                         }
                     }}
                 >
@@ -439,6 +468,10 @@ class MapsScreen extends React.PureComponent {
                     }
 
                 </MapView >
+
+
+
+
 
             </View>
 

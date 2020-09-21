@@ -10,7 +10,6 @@ import App from '../App';
 import renderer from 'react-test-renderer';
 
 jest.mock('tipsi-stripe', () => {
-  const View = require('react-native').View;
 
   return {
     setOptions: jest.fn()
@@ -19,12 +18,20 @@ jest.mock('tipsi-stripe', () => {
 });
 
 jest.mock('react-native-location', () => {
-  const View = require('react-native').View;
 
   return {
 
   };
 });
+
+
+jest.mock('@react-native-community/geolocation', () => {
+
+  return {
+
+  };
+});
+
 
 
 
