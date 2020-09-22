@@ -150,6 +150,15 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+      
+    release {
+      storeFile file('businessvalley.keystore')
+      storePassword 'Dreem@0777'
+      keyAlias 'business-valley'
+      keyPassword 'Dreem@0777'
+    
+  }
+
     }
     buildTypes {
         debug {
@@ -158,9 +167,10 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
+            
+            // minifyEnabled enableProguardInReleaseBuilds
+            // proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
 

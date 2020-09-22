@@ -47,12 +47,5 @@ exports[`renders correctly 1`] = `
       </Text>
     </View>
   </View>
-  <View
-    style={
-      Object {
-        "height": 22,
-      }
-    }
-  />
 </View>
 `;

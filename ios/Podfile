@@ -11,6 +11,7 @@ target 'BusinessValley' do
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
+
   target 'BusinessValleyTests' do
     inherit! :complete
     # Pods for testing

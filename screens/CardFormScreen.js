@@ -39,7 +39,14 @@ export default class CardFormScreen extends PureComponent {
             }
             const token = await OpenStripeCard()//await stripe.paymentRequestWithCardForm()
             console.log('TOKEN', token);
+            if (token) {
+                this.makePayment()
+            }
+            else {
+                alert('Payment Fails')
+            }
             if (this._isMount) {
+
 
                 this.setState({ loading: false, token })
             }
@@ -90,36 +97,6 @@ export default class CardFormScreen extends PureComponent {
                     />
                 }
 
-                {this.state.isPaid == false &&
-                    <View
-                        style={styles.token}>
-                        {token &&
-                            <>
-                                {/* <Text style={styles.instruction}>
-                                Token: {token.tokenId}
-                            </Text> */}
-
-
-                                <Button
-                                    text="Make Payment"
-                                    //   loading={loading}
-                                    testID='MakePayment'
-
-                                    style={{ bottom: 20 }}
-                                    onPress={this.makePayment}
-                                />
-
-                                {loadingP &&
-                                    <ActivityIndicator
-                                        testID='fff'
-                                        animating
-                                        size="small"
-                                    />
-                                }
-                            </>
-                        }
-                    </View>
-                }
             </View>
         )
     }

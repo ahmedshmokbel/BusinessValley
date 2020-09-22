@@ -62,3 +62,7 @@ jest.mock('react-native-reanimated', () => {
 it('renders correctly', () => {
   renderer.create(<App />);
 });
+
+
+
+
