@@ -38,7 +38,7 @@ const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const SPACE = 0.01;
 
 import CardFormScreen from './CardFormScreen';
-import { getLocationAsync } from '../LocationData';
+import { getLocationAsync, randomPointNearRect, getLatLng, getRandRangLocation } from '../LocationData';
 export const MapKey = 'AIzaSyCbfdkBxKCLIKiWx9CqAUxhoVEMDaKqQIg'
 
 import RNLocation from 'react-native-location';
@@ -55,8 +55,8 @@ class MapsScreen extends React.PureComponent {
         this.state = {
             currentLongitude: 0,
             currentLatitude: 0,
-            randomLatitude: 31.214325,
-            randomLongitude: 29.944535,
+            randomLatitude: getRandRangLocation().lat,
+            randomLongitude: getRandRangLocation().lat,
             coords: [],
             markLatitude: 0,
             markLongitude: 0,
@@ -150,8 +150,8 @@ class MapsScreen extends React.PureComponent {
             }
         })
 
-
-
+        // console.log('lat Rand', getLatLng(31.230063949511088, 22.04723074150344))
+        // console.log('lng Rand', getLatLng(36.81947645869894, 25.092409457632993))
 
 
     }
@@ -253,7 +253,7 @@ class MapsScreen extends React.PureComponent {
 
                 var res = await fetch(apiUrl)
                 var respJson = await res.json()
-                // console.log('Routes', respJson.routes[0].overview_polyline.points);
+                //       console.log('Routes', respJson.routes[0].overview_polyline.points);
                 let points = Polyline.decode(respJson.routes[0].overview_polyline.points);
                 let coords = points.map((point, index) => {
                     return {
@@ -414,8 +414,7 @@ class MapsScreen extends React.PureComponent {
                             this._DrawDirection(this.state.randomLatitude, this.state.randomLongitude)
 
                         }
-                    }}
-                >
+                    }}>
                     {this.state.isMapReady &&
                         <MapView.Polyline
                             coordinates={this.state.coords}

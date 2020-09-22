@@ -138,3 +138,31 @@ export const getLocationAsync = () => {
 }
 
 
+
+
+export const getRandRangLocation = () => {
+    const locations = [{ lat: 30.004463590130133, lng: 31.22987582899576 },
+    { lat: 30.06183628555302, lng: 31.231638585463234 },
+    { lat: 30.12459197239538, lng: 31.261066575701513 },
+    { lat: 30.117871441171623, lng: 31.36639115562378 },
+    { lat: 30.027159299462802, lng: 31.20740539045705 },
+    { lat: 30.6087236, lng: 32.301847 },
+    { lat: 31.251520797721312, lng: 29.984505977300845 },
+    { lat: 31.236122204137835, lng: 29.950371362926496 },
+    { lat: 31.215525642462815, lng: 29.945902697735292 },
+    { lat: 31.207934194530196, lng: 29.964801566179368 },
+    { lat: 31.201876059843325, lng: 29.8880890374658 },]
+
+    const random = Math.floor(Math.random() * locations.length);
+    console.log(random, locations[random]);
+    return locations[random]
+}
+
+export const getLatLng = (a, b) => { // a and b included 
+
+
+    //latlng=[{lat:}]
+
+    return (Math.random() * (b - a + 1) + a);
+}
+
